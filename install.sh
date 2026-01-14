@@ -1,66 +1,102 @@
 #!/bin/bash
 
-# ===== Colors =====
-RED="\e[31m"
+# -------- COLORS ----------
 GREEN="\e[32m"
+RED="\e[31m"
 CYAN="\e[36m"
+YELLOW="\e[33m"
 RESET="\e[0m"
 
-# ===== Root check =====
+# -------- ROOT CHECK ----------
 if [ "$EUID" -ne 0 ]; then
-  echo "Run as root"
+  echo "Please run as root"
   exit 1
 fi
 
-install_deps() {
-  echo "🚀 Custom Installer Started"
-  echo "Updating system..."
-  apt update -y
-
-  echo "Installing required packages..."
-  apt install -y curl wget git sudo
+pause() {
+  read -p "Press Enter to continue..."
 }
 
 banner() {
-clear
-echo -e "${RED}"
-cat << "EOF"
-━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
- 😴 SLEEPYBUDDY HOSTING MANAGER
- made by SleepyBuddy
-━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+  clear
+  echo -e "${YELLOW}"
+  cat << "EOF"
+╔══════════════════════════════════════╗
+║ 🦖  PTERODACTYL CONTROL CENTER       ║
+╚══════════════════════════════════════╝
 EOF
-echo -e "${RESET}"
+  echo -e "${RESET}"
 }
 
-menu() {
-echo -e "${CYAN}"
-echo "1) Panel Installation"
-echo "2) Wings Installation"
-echo "3) Uninstall Tools"
-echo "4) Blueprint + Theme + Extensions"
-echo "5) Cloudflare Setup"
-echo "6) System Information"
-echo "7) Tailscale (install + up)"
-echo "8) Database Setup"
-echo "0) Exit"
-echo -e "${RESET}"
-read -p "Select an option [0-8]: " opt
+# -------- OPTION FUNCTIONS ----------
+
+install_panel() {
+  banner
+  echo -e "${GREEN}Installing Pterodactyl Panel...${RESET}"
+  bash <(curl -fsSL https://pterodactyl-installer.se)
+  pause
 }
 
+create_panel_user() {
+  banner
+  if [ ! -d /var/www/pterodactyl ]; then
+    echo -e "${RED}Panel not installed!${RESET}"
+    pause
+    return
+  fi
+  cd /var/www/pterodactyl || return
+  php artisan p:user:make
+  pause
+}
+
+update_panel() {
+  banner
+  if [ ! -d /var/www/pterodactyl ]; then
+    echo -e "${RED}Panel not installed!${RESET}"
+    pause
+    return
+  fi
+
+  echo -e "${GREEN}Updating Panel...${RESET}"
+  cd /var/www/pterodactyl || return
+  php artisan down
+  curl -L https://github.com/pterodactyl/panel/releases/latest/download/panel.tar.gz | tar -xz
+  chmod -R 755 storage/* bootstrap/cache
+  composer install --no-dev --optimize-autoloader
+  php artisan migrate --seed --force
+  php artisan up
+  pause
+}
+
+uninstall_panel() {
+  banner
+  read -p "Type YES to uninstall panel: " confirm
+  if [ "$confirm" = "YES" ]; then
+    rm -rf /var/www/pterodactyl
+    echo -e "${RED}Panel removed${RESET}"
+  else
+    echo "Cancelled"
+  fi
+  pause
+}
+
+# -------- MAIN MENU LOOP ----------
 while true; do
   banner
-  menu
+  echo -e "${GREEN}1) Install Panel"
+  echo -e "${CYAN}2) Create Panel User"
+  echo -e "${GREEN}3) Update Panel"
+  echo -e "${RED}4) Uninstall Panel"
+  echo -e "5) Exit${RESET}"
+  echo
+  read -p "Select Option → " opt
+
   case $opt in
-    1) echo "Panel installer coming soon"; sleep 2 ;;
-    2) echo "Wings installer coming soon"; sleep 2 ;;
-    3) echo "Uninstall tools coming soon"; sleep 2 ;;
-    4) echo "Blueprint setup coming soon"; sleep 2 ;;
-    5) echo "Cloudflare setup coming soon"; sleep 2 ;;
-    6) uname -a; read -p "Enter to return" ;;
-    7) curl -fsSL https://tailscale.com/install.sh | sh && tailscale up ;;
-    8) echo "Database setup coming soon"; sleep 2 ;;
-    0) echo "Goodbye 😴"; exit 0 ;;
-    *) echo "Invalid option"; sleep 1 ;;
+    1) install_panel ;;
+    2) create_panel_user ;;
+    3) update_panel ;;
+    4) uninstall_panel ;;
+    5) exit 0 ;;
+    *) echo -e "${RED}Invalid option${RESET}"; sleep 1 ;;
   esac
 done
