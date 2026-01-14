@@ -29,30 +29,24 @@ while true; do
     case $p in
         1)
             clear
-            echo "Installing Panel..."
-            sleep 2
-            echo "Panel Installed (demo)"
+            echo "Running Official Pterodactyl Installer..."
+            # Official one-line installer command:
+            bash <(curl -s https://pterodactyl-installer.se)
             pause
             ;;
         2)
             clear
-            echo "Creating Panel User..."
-            sleep 2
-            echo "User Created (demo)"
+            echo "Create Panel User (demo)"
             pause
             ;;
         3)
             clear
-            echo "Updating Panel..."
-            sleep 2
-            echo "Panel Updated (demo)"
+            echo "Update Panel (demo)"
             pause
             ;;
         4)
             clear
-            echo "Uninstalling Panel..."
-            sleep 2
-            echo "Panel Removed (demo)"
+            echo "Uninstall Panel (demo)"
             pause
             ;;
         5)
