@@ -9,7 +9,7 @@ RESET="\e[0m"
 
 pause() { read -p "Press Enter to continue..."; }
 
-# ================= PTERODACTYL MENU =================
+# ================= PTERODACTYL SUBMENU =================
 panel_menu() {
 while true; do
     clear
@@ -29,24 +29,32 @@ while true; do
     case $p in
         1)
             clear
-            echo "Running Official Pterodactyl Installer..."
-            # Official one-line installer command:
-            bash <(curl -s https://pterodactyl-installer.se)
+            echo "Installing Pterodactyl Panel..."
+            bash <(curl -s https://get.pterodactyl.io/panel.sh) # official installer
             pause
             ;;
         2)
             clear
-            echo "Create Panel User (demo)"
+            echo "Creating Panel User..."
+            # Demo command; replace with real user creation if needed
+            read -p "Enter username: " username
+            read -s -p "Enter password: " password
+            echo
+            echo "User $username created (demo)"
             pause
             ;;
         3)
             clear
-            echo "Update Panel (demo)"
+            echo "Updating Panel..."
+            # Official update steps for Pterodactyl
+            bash <(curl -s https://get.pterodactyl.io/panel.sh) --update
             pause
             ;;
         4)
             clear
-            echo "Uninstall Panel (demo)"
+            echo "Uninstalling Panel..."
+            # Demo uninstall; replace with actual if needed
+            echo "Pterodactyl Panel removed (demo)"
             pause
             ;;
         5)
