@@ -1,143 +1,84 @@
 #!/bin/bash
+#==================================================
+#           PTERODACTYL CONTROL CENTER
+#==================================================
 
-# -------- COLORS ----------
+# Colors for menu
 GREEN="\e[32m"
-CYAN="\e[36m"
-RED="\e[31m"
+BLUE="\e[34m"
 YELLOW="\e[33m"
+RED="\e[31m"
 RESET="\e[0m"
 
-pause() { read -p "Press Enter to continue..."; }
+#----------------------
+# Functions for each option
+#----------------------
 
-# ================= PTERODACTYL SUBMENU =================
-panel_menu() {
-while true; do
-    clear
-    echo -e "${YELLOW}╔══════════════════════════════════╗${RESET}"
-    echo -e "${YELLOW}║  🦖 PTERODACTYL CONTROL CENTER  ║${RESET}"
-    echo -e "${YELLOW}╚══════════════════════════════════╝${RESET}"
-    echo
-    echo -e "${GREEN}1) Install Panel${RESET}"
-    echo -e "${CYAN}2) Create Panel User${RESET}"
-    echo -e "${GREEN}3) Update Panel${RESET}"
-    echo -e "${RED}4) Uninstall Panel${RESET}"
-    echo -e "5) Back${RESET}"
-    echo
-    echo -ne "Select Option → "
-    read p
-
-    case $p in
-        1)
-            clear
-            echo "Installing Pterodactyl Panel..."
-            bash <(curl -s https://get.pterodactyl.io/panel.sh) # official installer
-            pause
-            ;;
-        2)
-            clear
-            echo "Creating Panel User..."
-            # Demo command; replace with real user creation if needed
-            read -p "Enter username: " username
-            read -s -p "Enter password: " password
-            echo
-            echo "User $username created (demo)"
-            pause
-            ;;
-        3)
-            clear
-            echo "Updating Panel..."
-            # Official update steps for Pterodactyl
-            bash <(curl -s https://get.pterodactyl.io/panel.sh) --update
-            pause
-            ;;
-        4)
-            clear
-            echo "Uninstalling Panel..."
-            # Demo uninstall; replace with actual if needed
-            echo "Pterodactyl Panel removed (demo)"
-            pause
-            ;;
-        5)
-            break
-            ;;
-        *)
-            echo "Invalid option!"
-            sleep 1
-            ;;
-    esac
-done
+install_panel() {
+    echo -e "${GREEN}🚀 Installing Pterodactyl Panel...${RESET}"
+    # Run the official Pterodactyl install script
+    bash <(curl -s https://raw.githubusercontent.com/pterodactyl/panel/develop/install.sh)
+    echo -e "${GREEN}✅ Panel installation completed!${RESET}"
+    read -p "Press Enter to return to menu..."
 }
 
-# ================= MAIN MENU =================
+create_user() {
+    echo -e "${BLUE}👤 Create Panel User${RESET}"
+    read -p "Enter new panel username: " username
+    read -sp "Enter password: " password
+    echo
+    # Here you would run the real user creation command or DB insert
+    echo -e "${BLUE}User ${username} created (demo)${RESET}"
+    read -p "Press Enter to return to menu..."
+}
+
+update_panel() {
+    echo -e "${YELLOW}🔄 Updating Panel...${RESET}"
+    cd /var/www/pterodactyl || { echo "Directory not found!"; return; }
+    git pull origin master
+    composer install --no-dev --optimize-autoloader
+    php artisan migrate --force
+    php artisan view:clear
+    php artisan cache:clear
+    php artisan config:clear
+    echo -e "${YELLOW}✅ Panel updated!${RESET}"
+    read -p "Press Enter to return to menu..."
+}
+
+uninstall_panel() {
+    echo -e "${RED}⚠️ Uninstalling panel...${RESET}"
+    systemctl stop pteroq.service
+    rm -rf /var/www/pterodactyl
+    echo -e "${RED}✅ Panel uninstalled!${RESET}"
+    read -p "Press Enter to return to menu..."
+}
+
+exit_menu() {
+    echo "👋 Exiting..."
+    exit 0
+}
+
+#----------------------
+# Main Menu
+#----------------------
 while true; do
     clear
-    echo -e "${YELLOW}╔══════════════════════════════════╗${RESET}"
-    echo -e "${YELLOW}║       😴 SLEEPYBUDDY MANAGER     ║${RESET}"
-    echo -e "${YELLOW}╚══════════════════════════════════╝${RESET}"
+    echo "==========================================="
+    echo -e "${YELLOW}🦖  PTERODACTYL CONTROL CENTER${RESET}"
+    echo "==========================================="
+    echo -e "${GREEN}1) Install Panel${RESET}"
+    echo -e "${BLUE}2) Create Panel User${RESET}"
+    echo -e "${YELLOW}3) Update Panel${RESET}"
+    echo -e "${RED}4) Uninstall Panel${RESET}"
+    echo -e "5) Exit"
     echo
-    echo -e "${GREEN}1) Pterodactyl Control Center${RESET}"
-    echo -e "${CYAN}2) Wings Installer${RESET}"
-    echo -e "${CYAN}3) Cloudflare Setup${RESET}"
-    echo -e "${CYAN}4) System Info${RESET}"
-    echo -e "${CYAN}5) Tailscale Install${RESET}"
-    echo -e "${CYAN}6) Database Setup${RESET}"
-    echo -e "${CYAN}7) Blueprint+Theme+Extensions${RESET}"
-    echo -e "${CYAN}8) Uninstall Tools${RESET}"
-    echo -e "${CYAN}9) Network Info${RESET}"
-    echo -e "${CYAN}10) Exit${RESET}"
-    echo
-    echo -ne "Select Option → "
-    read opt
-
-    case $opt in
-        1) panel_menu ;;
-        2)
-            clear
-            echo "Wings Installer (demo)"
-            pause
-            ;;
-        3)
-            clear
-            echo "Cloudflare Setup (demo)"
-            pause
-            ;;
-        4)
-            clear
-            uname -a
-            pause
-            ;;
-        5)
-            clear
-            echo "Tailscale Install (demo)"
-            pause
-            ;;
-        6)
-            clear
-            echo "Database Setup (demo)"
-            pause
-            ;;
-        7)
-            clear
-            echo "Blueprint+Theme+Extensions (demo)"
-            pause
-            ;;
-        8)
-            clear
-            echo "Uninstall Tools (demo)"
-            pause
-            ;;
-        9)
-            clear
-            echo "Network Info (demo)"
-            pause
-            ;;
-        10)
-            echo "Exiting..."
-            exit 0
-            ;;
-        *)
-            echo "Invalid option!"
-            sleep 1
-            ;;
+    read -p "Select Option → " choice
+    case $choice in
+        1) install_panel ;;
+        2) create_user ;;
+        3) update_panel ;;
+        4) uninstall_panel ;;
+        5) exit_menu ;;
+        *) echo "Invalid option! Press Enter to try again..." ; read ;;
     esac
 done
