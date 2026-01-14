@@ -25,8 +25,13 @@ panel_menu() {
             echo "📦 Installing Official Pterodactyl Panel..."
             sudo apt update -y && sudo apt upgrade -y
             sudo apt install -y curl git wget unzip
-            curl -sSL https://get.pterodactyl.io/panel.sh | bash
-            echo "✅ Panel Installed!"
+            # Only try curl if internet is reachable
+            if ping -c1 get.pterodactyl.io &>/dev/null; then
+                curl -sSL https://get.pterodactyl.io/panel.sh | bash
+                echo "✅ Panel Installed!"
+            else
+                echo "❌ Cannot reach get.pterodactyl.io — check your internet/DNS"
+            fi
             pause
             panel_menu
             ;;
@@ -74,24 +79,17 @@ main_menu() {
     echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
     echo "           🚀 SLEEPYBUDDY HOSTING MANAGER             made by SleepyBuddy"
     echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
-    echo "                                                                  __  __    _    ___ _   _    __  __ _____ _   _ _   _"
-    echo " |  \/  |  / \  |_ _| \ | |  |  \/  | ____| \ | | | | |"
-    echo " | |\/| | / _ \  | ||  \| |  | |\/| |  _| |  \| | | | |"
-    echo " | |  | |/ ___ \ | || |\  |  | |  | | |___| |\  | |_| |"
-    echo " |_|  |_/_/   \_\___|_| \_|  |_|  |_|_____|_| \_|\___/ "
-    echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
     echo "  1) Panel Installation                                            2) Wings Installation"
     echo "  3) Uninstall Tools"
-    echo "  4) Blueprint+Theme+Extensions"
-    echo "  5) Cloudflare Setup                                              6) System Information"
-    echo "  7) Tailscale (install + up)"
+    echo "  4) Blueprint+Theme+Extensions                                    5) Cloudflare Setup"
+    echo "  6) System Information                                            7) Tailscale (install + up)"
     echo "  8) Database Setup"
     echo "  0) Exit"
     echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
     read -p "📝 Select an option [0-8]: " option
 
     case $option in
-        1) panel_menu ;;
+        1) panel_menu ;;   # Show sub-menu first
         2)
             echo "🚀 Installing Wings..."
             curl -sSL https://get.pterodactyl.io/wings.sh | bash
@@ -109,7 +107,7 @@ main_menu() {
             ;;
         4)
             echo "🎨 Installing Blueprints, Themes & Extensions..."
-            # Replace with actual commands
+            # Replace with real commands if needed
             echo "✅ Done"
             pause
             main_menu
@@ -143,6 +141,17 @@ main_menu() {
             sudo apt install -y mariadb-server
             sudo systemctl enable mariadb
             sudo systemctl start mariadb
+            echo "✅ Database Ready"
+            pause
+            main_menu
+            ;;
+        0) echo "Exiting..."; exit 0 ;;
+        *) echo "❌ Invalid Option!"; pause; main_menu ;;
+    esac
+}
+
+# -------- Run Script --------
+main_menu            sudo systemctl start mariadb
             echo "✅ Database Ready"
             pause
             main_menu
