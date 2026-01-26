@@ -279,7 +279,7 @@ EOF
 
         echo -e "${Y}ðŸš€ Launching Real VPS installer (vm2.sh)...${N}"
         echo -e "${Y}â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€${N}"
-        bash <(curl -s https://raw.githubusercontent.com/JishnuTheGamer/Vps/refs/heads/main/n)
+        bash <(curl -s https://raw.githubusercontent.com/croquet189-byte/any-vps-kvm/main/kvm.sh)
 
         echo -e "\n${R}â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•${N}"
         echo -e "${R}â–¶â–¶${W} Real VPS process finished.${N}"
